@@ -49,10 +49,10 @@ describe('#serializeToModule', function () {
       b: r,
       c: {
         d: r,
-        '0': r,
+        0: r,
         'spa ce': r
       },
-      '0': r,
+      0: r,
       'spa ce': r
     }
     var res = serializeToModule(o, {
@@ -79,7 +79,7 @@ describe('#serializeToModule', function () {
     var res = serializeToModule(o, {
       reference: true
     })
-    var exp = 'var m = module.exports = {\n  a: {\n    one: true,\n    "thr-ee": /^test$/\n  },\n  c: {}\n};\nm.b = m.a;\nm.c.d = m.a;'
+    var exp = 'var m = module.exports = {\n  a: {\n    one: true,\n    "thr-ee": new RegExp("^test$", "")\n  },\n  c: {}\n};\nm.b = m.a;\nm.c.d = m.a;'
     // log(res);
     assert.strictEqual(res, exp)
     assert.deepStrictEqual(o, getObj(res))
