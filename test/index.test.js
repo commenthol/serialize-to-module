@@ -3,8 +3,8 @@
 
 'use strict'
 
-var assert = require('assert')
-var serializeToModule = require('..')
+const assert = require('assert')
+const serializeToModule = require('..')
 
 if (typeof assert.deepStrictEqual === 'undefined') {
   assert.deepStrictEqual = assert.deepEqual // eslint-disable-line
@@ -20,31 +20,31 @@ function getObj (str) {
 
 describe('#serializeToModule', function () {
   it('object of objects', function () {
-    var r = {
+    const r = {
       one: true,
       two: 'a string\nwith multiple\r\nlines.',
       'thr-ee': undefined
     }
-    var o = {
+    const o = {
       a: r,
       b: r,
       c: {
         d: r
       }
     }
-    var res = serializeToModule(o)
-    var exp = 'module.exports = {\n  a: {\n    one: true,\n    two: "a string\\nwith multiple\\r\\nlines.",\n    "thr-ee": undefined\n  },\n  b: {\n    one: true,\n    two: "a string\\nwith multiple\\r\\nlines.",\n    "thr-ee": undefined\n  },\n  c: {\n    d: {\n      one: true,\n      two: "a string\\nwith multiple\\r\\nlines.",\n      "thr-ee": undefined\n    }\n  }\n};'
+    const res = serializeToModule(o)
+    const exp = 'var m = {\n  a: {\n    one: true,\n    two: "a string\\nwith multiple\\r\\nlines.",\n    "thr-ee": undefined\n  },\n  b: {\n    one: true,\n    two: "a string\\nwith multiple\\r\\nlines.",\n    "thr-ee": undefined\n  },\n  c: {\n    d: {\n      one: true,\n      two: "a string\\nwith multiple\\r\\nlines.",\n      "thr-ee": undefined\n    }\n  }\n};\nmodule.exports = m;\n'
     // log(res)
     assert.strictEqual(res, exp)
     assert.deepStrictEqual(o, getObj(res))
   })
   it('object of objects using references', function () {
-    var r = {
+    const r = {
       one: true,
       two: 'a string\nwith multiple\r\nlines.',
       'thr-ee': undefined
     }
-    var o = {
+    const o = {
       a: r,
       b: r,
       c: {
@@ -55,47 +55,61 @@ describe('#serializeToModule', function () {
       0: r,
       'spa ce': r
     }
-    var res = serializeToModule(o, {
+    const res = serializeToModule(o, {
       reference: true,
       beautify: false
     })
-    var exp = 'var m = module.exports = {"0": {one: true, two: "a string\\nwith multiple\\r\\nlines.", "thr-ee": undefined}, c: {}};\nm.a = m["0"];\nm.b = m["0"];\nm.c["0"] = m["0"];\nm.c.d = m["0"];\nm.c["spa ce"] = m["0"];\nm["spa ce"] = m["0"];\n'
+    const exp = 'var m = {"0": {one: true, two: "a string\\nwith multiple\\r\\nlines.", "thr-ee": undefined}, c: {}};\nm.a = m["0"];\nm.b = m["0"];\nm.c["0"] = m["0"];\nm.c.d = m["0"];\nm.c["spa ce"] = m["0"];\nm["spa ce"] = m["0"];\nmodule.exports = m;\n'
     // log(res)
     assert.strictEqual(res, exp)
     assert.deepStrictEqual(o, getObj(res))
   })
   it('object of objects - beautify', function () {
-    var r = {
+    const r = {
       one: true,
       'thr-ee': /^test$/
     }
-    var o = {
+    const o = {
       a: r,
       b: r,
       c: {
         d: r
       }
     }
-    var res = serializeToModule(o, {
+    const res = serializeToModule(o, {
       reference: true
     })
-    var exp = 'var m = module.exports = {\n  a: {\n    one: true,\n    "thr-ee": new RegExp("^test$", "")\n  },\n  c: {}\n};\nm.b = m.a;\nm.c.d = m.a;'
+    const exp = 'var m = {\n  a: {\n    one: true,\n    "thr-ee": new RegExp("^test$", "")\n  },\n  c: {}\n};\nm.b = m.a;\nm.c.d = m.a;\nmodule.exports = m;\n'
     // log(res);
     assert.strictEqual(res, exp)
     assert.deepStrictEqual(o, getObj(res))
   })
   it('obj - with comments header', function () {
-    var o = {
+    const o = {
       a: {
         b: 'one'
       }
     }
-    var res = serializeToModule(o, {
+    const res = serializeToModule(o, {
       comment: 'eslint-disable'
     })
-    var exp = '/* eslint-disable */\nmodule.exports = {\n  a: {\n    b: "one"\n  }\n};'
+    const exp = '/* eslint-disable */\nvar m = {\n  a: {\n    b: "one"\n  }\n};\nmodule.exports = m;\n'
     // log(res)
     assert.strictEqual(res, exp)
     assert.deepStrictEqual(o, getObj(res))
+  })
+  it('obj - with comments header and exporting esm module', function () {
+    const o = {
+      a: {
+        b: 'one'
+      }
+    }
+    const res = serializeToModule(o, {
+      comment: 'eslint-disable',
+      esm: true
+    })
+    const exp = '/* eslint-disable */\nconst m = {\n  a: {\n    b: "one"\n  }\n};\nexport default m;\n'
+    // log(res)
+    assert.strictEqual(res, exp)
   })
 })

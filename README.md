@@ -45,16 +45,17 @@ serialize to a module which can be `require`ed.
 #### Example - serializing while respecting references
 
 ```js
-var serialTM = require('serialize-to-module')
-var obj = { object: { regexp: /^test?$/ } }
+const serialTM = require('serialize-to-module')
+const obj = { object: { regexp: /^test?$/ } }
 obj.reference = obj.object
 console.log(serialTM(obj, { reference: true }))
-//> var m = module.exports = {
-//>     object: {
-//>         regexp: /^test?$/
-//>     }
+//> var m = {
+//>   object: {
+//>     regexp: /^test?$/
+//>   }
 //> };
 //> m.reference = m.object;
+//> module.exports = m;
 ```
 
 **Parameters**
@@ -72,6 +73,8 @@ console.log(serialTM(obj, { reference: true }))
 **opts.beautify**: `Boolean | Object`, beautify output - default is `false`. If Object then use je-beautify options.
 
 **opts.unsafe**: `Boolean`, do not escape chars `<>/`
+
+**opts.esm**: `Boolean`, use `export default` instead of common js `module.exports`
 
 **Returns**: `String`, serialized representation of `source` as module
 
