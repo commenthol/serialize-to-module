@@ -3,9 +3,8 @@
 > serialize objects to node module
 
 [![NPM version](https://badge.fury.io/js/serialize-to-module.svg)](https://www.npmjs.com/package/serialize-to-module/)
-[![Build Status](https://secure.travis-ci.org/commenthol/serialize-to-module.svg?branch=master)](https://travis-ci.org/commenthol/serialize-to-module)
 
-Serialize objects into a `require`-able module while checking circular structures and respecting references.
+Serialize objects into a module while checking circular structures and respecting references. The package is ESM-first; `require()` remains supported for CommonJS consumers.
 
 The following Objects are supported
 
@@ -27,10 +26,10 @@ The following Objects are supported
 
 <!-- !toc (minlevel=2 omit="Table of Contents") -->
 
-* [Methods](#methods)
-  * [serializeToModule](#serializetomodule)
-* [Contribution and License Agreement](#contribution-and-license-agreement)
-* [License](#license)
+- [Methods](#methods)
+  - [serializeToModule](#serializetomodule)
+- [Contribution and License Agreement](#contribution-and-license-agreement)
+- [License](#license)
 
 <!-- toc! -->
 
@@ -40,22 +39,22 @@ The following Objects are supported
 
 `serializeToModule(source, opts, opts.ignoreCircular, opts.reference, opts.comment, opts.beautify) `
 
-serialize to a module which can be `require`ed.
+Serialize to an ESM module by default. Set `opts.esm` to `false` to generate CommonJS.
 
 #### Example - serializing while respecting references
 
 ```js
-const serialTM = require('serialize-to-module')
+import serialTM from 'serialize-to-module'
 const obj = { object: { regexp: /^test?$/ } }
 obj.reference = obj.object
 console.log(serialTM(obj, { reference: true }))
-//> var m = {
+//> const m = {
 //>   object: {
-//>     regexp: /^test?$/
+//>     regexp: new RegExp("^test?$", "")
 //>   }
 //> };
 //> m.reference = m.object;
-//> module.exports = m;
+//> export default m;
 ```
 
 **Parameters**
@@ -74,7 +73,7 @@ console.log(serialTM(obj, { reference: true }))
 
 **opts.unsafe**: `Boolean`, do not escape chars `<>/`
 
-**opts.esm**: `Boolean`, use `export default` instead of common js `module.exports`
+**opts.esm**: `Boolean`, defaults to `true` (ESM); set to `false` to generate CommonJS (`module.exports`)
 
 **Returns**: `String`, serialized representation of `source` as module
 

@@ -1,6 +1,6 @@
 {
   "name": "serialize-to-module",
-  "version": "1.1.1",
+  "version": "2.0.0-0",
   "description": "serialize objects to node module",
   "keywords": [
     "javascript",
@@ -17,50 +17,53 @@
   },
   "license": "MIT",
   "author": "commenthol <commenthol@gmail.com>",
-  "main": "lib",
-  "directories": {
-    "test": "test"
+  "maintainers": "commenthol <commenthol@gmail.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./lib/index.cjs",
+      "types": "./types/index.d.ts"
+    }
   },
+  "main": "./lib/index.cjs",
+  "module": "./src/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "lib",
+    "src",
+    "types"
+  ],
   "scripts": {
-    "all": "npm run lint && npm test",
+    "all": "npm run ci",
+    "build": "rollup src/index.js --format cjs --exports default --file lib/index.cjs --external serialize-to-js,js-beautify",
+    "ci": "npm run lint && npm test && npm run types && npm run build",
     "clean": "rimraf doc coverage .nyc_output node_modules *.tgz",
     "coverage": "nyc -r text -r html npm test",
-    "doc": "jsdox -o doc lib/*.js",
-    "lint": "eslint lib test",
-    "prepublishOnly": "npm run all",
+    "format": "prettier --write README.md eslint.config.js src test lib",
+    "lint": "eslint src test",
     "readme": "markedpp --githubid -i README.md -o README.md",
-    "test": "mocha"
-  },
-  "eslintConfig": {
-    "plugins": [
-      "standard"
-    ],
-    "extends": "standard",
-    "rules": {
-      "key-spacing": 0
-    }
+    "test": "mocha",
+    "types": "tsc -p tsconfig.json"
   },
   "mocha": {
     "checkLeaks": true,
     "reporter": "spec"
   },
   "dependencies": {
-    "js-beautify": "^1.15.4",
-    "serialize-to-js": "^3.2.0"
+    "js-beautify": "^2.0.3",
+    "serialize-to-js": "^4.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "eslint-plugin-standard": "^5.0.0",
-    "mocha": "^8.4.0",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2"
+    "eslint": "^10.15.0",
+    "mocha": "^12.0.3",
+    "nyc": "^18.0.0",
+    "prettier": "^3.10.1",
+    "rimraf": "^6.1.4",
+    "rollup": "^4.68.8",
+    "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=4.0.0"
-  },
-  "maintainers": "commenthol <commenthol@gmail.com>"
+    "node": ">=12.17.0"
+  }
 }
